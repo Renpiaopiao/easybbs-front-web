@@ -199,7 +199,7 @@
           <el-button class="opt-button" type="primary" size="default" @click="doSumit">
             <span v-if="opType === 0">注册</span>
             <span v-if="opType === 1">登录</span>
-            <span v-if="opType === 2">充值密码</span>
+            <span v-if="opType === 2">重置密码</span>
           </el-button>
         </el-form-item>
       </el-form>
@@ -302,7 +302,7 @@ const sendEmailCode = () => {
       return
     }
     const params = Object.assign({},formData4SendMailCode.value) 
-    params.type = 0
+    params.type = opType.value === 0 ? 0 : 1;
     let result = await proxy.request({
        url:api.sendMailCode,
        params:params,
@@ -393,23 +393,26 @@ const resetForm = () => {
   }
   //将form表单重置 - 刷新表单数据
   nextTick(() => {
-    changeCheckCode(0)
-    formDataRef.value.resetFields()
+    changeCheckCode(0);
+    formDataRef.value.resetFields();
   })
 }
 
 // 登录、注册、重置密码、提交表单
 const doSumit = () => {
+  console.log(formData.value);
   formDataRef.value.validate(async (valid) => {
     if(!valid){
       return;
     }
     let params = {}
     Object.assign(params,formData.value)
-
+    console.log('params:',params);
     // 注册
-    if(opType === 0){
-      params.password = params.reRegisterPassword;
+    if(opType.value === 0 || opType.value === 2){
+      params.password = params.registerPassword;
+      delete params.registerPassword;
+      delete params.reRegisterPassword;
     }
     let url = null;
     if(opType.value === 0){
@@ -432,10 +435,13 @@ const doSumit = () => {
     }
     // opType 0是注册，1是登录，2是找回密码
     if(opType.value === 0){
-      proxy.Message("注册成功，请登录")
+      proxy.Message.success("注册成功，请登录")
       showPanel(1)
     }else if(opType.value === 1){ 
 
+    }else if(opType.value === 2){
+      proxy.Message.success("重置密码成功，请登录")
+      showPanel(1);
     }
   })
 }
