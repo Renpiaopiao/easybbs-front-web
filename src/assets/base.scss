@@ -1,0 +1,16 @@
+// todo：自定义滑动条
+// 链接颜色
+:root {
+  --link:#007fff;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.a-link {
+  text-decoration: none;
+  color: var(--link);
+  cursor: pointer;
+}
