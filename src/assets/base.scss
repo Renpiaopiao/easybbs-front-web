@@ -14,3 +14,7 @@ body {
   color: var(--link);
   cursor: pointer;
 }
+
+.el-dropdown-link:focus {
+  outline: none;
+}

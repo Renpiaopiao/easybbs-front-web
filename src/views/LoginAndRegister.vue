@@ -247,6 +247,7 @@
 <script setup>
 import { ref, reactive, getCurrentInstance, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import md5 from "js-md5"
 const { proxy } = getCurrentInstance()
 const api = {
   checkCode: '/api/checkCode',
@@ -395,25 +396,41 @@ const resetForm = () => {
   nextTick(() => {
     changeCheckCode(0);
     formDataRef.value.resetFields();
+
+    // 登录，判断有误cookie信息
+    if(opType.value === 1){
+      const cookieLoginInfo = proxy.VueCookies.get("loginInfo");
+      console.log('cookieLoginInfo:',cookieLoginInfo);
+      if(cookieLoginInfo){
+        formData.value = cookieLoginInfo
+      }
+    }
   })
 }
 
 // 登录、注册、重置密码、提交表单
 const doSumit = () => {
-  console.log(formData.value);
   formDataRef.value.validate(async (valid) => {
     if(!valid){
       return;
     }
     let params = {}
     Object.assign(params,formData.value)
-    console.log('params:',params);
     // 注册
     if(opType.value === 0 || opType.value === 2){
       params.password = params.registerPassword;
       delete params.registerPassword;
       delete params.reRegisterPassword;
     }
+    // 登录
+    if(opType.value === 1){
+      let cookieLoginInfo = proxy.VueCookies.get('loginInfo');
+      let cookiePassword = cookieLoginInfo === null ? null : cookieLoginInfo.password;
+      if(params.password !== cookiePassword){
+        params.password = md5(params.password)
+      }
+    }
+
     let url = null;
     if(opType.value === 0){
       url = api.register;
@@ -438,7 +455,19 @@ const doSumit = () => {
       proxy.Message.success("注册成功，请登录")
       showPanel(1)
     }else if(opType.value === 1){ 
-
+      //记住我
+      if(params.rememberMe){
+        const loginInfo =  {
+          email: params.email,
+          password: params.password,
+          rememberMe: params.rememberMe
+        }
+        proxy.VueCookies.set("loginInfo",loginInfo,"7d")
+      }else {
+        proxy.VueCookies.remove("loginInfo")
+      }
+      dialogConfig.show = false;
+      proxy.Message.success("登录成功");
     }else if(opType.value === 2){
       proxy.Message.success("重置密码成功，请登录")
       showPanel(1);

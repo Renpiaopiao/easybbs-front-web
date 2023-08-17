@@ -16,10 +16,41 @@
           <el-button type="primary" size="default" class="opt-btn" @click="">
             搜索<span class="iconfont icon-search"></span>
           </el-button>
-          <el-button-group :style="{'margin-left':'10px'}">
+          <!-- <el-button-group :style="{'margin-left':'10px'}">
           <el-button type="primary" size="default" plain @click="LoginAndRegistered(1)">登录</el-button>
           <el-button type="primary" size="default" plain @click="LoginAndRegistered(0)">注册</el-button>
-          </el-button-group>
+          </el-button-group> -->
+          <div class="message-info">
+            <el-dropdown>
+              <span class="el-dropdown-link">
+                <el-badge :value="12">
+                <div class="iconfont icon-message"></div>
+                </el-badge>
+              </span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item>回复我的</el-dropdown-item>
+                    <el-dropdown-item>赞了我的文章</el-dropdown-item>
+                    <el-dropdown-item>下载了我的附件</el-dropdown-item>
+                    <el-dropdown-item>赞了我的评论</el-dropdown-item>
+                    <el-dropdown-item>系统消息</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+          </div>
+          <div class="user-info">
+            <el-dropdown>
+              <span class="el-dropdown-link">
+                <avatar :userId="7693441284" :width="50"></avatar>
+              </span>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item>我的主页</el-dropdown-item>
+                    <el-dropdown-item>退出</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+          </div>
         </div>
       </div>
     </div>
@@ -137,11 +168,23 @@ onMounted(()=>{
     .user-info-panel {
       width: 300px;
       display: flex;
+      align-items: center;
       .opt-btn {
         margin-left: 5px;
         .iconfont {
           margin-left: 5px;
         }
+      }
+      .message-info {
+        .icon-message {
+          font-size: 25px;
+          color: #878585;
+        }
+        margin-left: 5px;
+        margin-right: 25px;
+      }
+      .user-info {
+ 
       }
     }
 

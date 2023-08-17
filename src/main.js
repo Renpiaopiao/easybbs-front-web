@@ -19,15 +19,18 @@ import request from  './utils/Request'
 
 //全局组件
 import Dialog from '@/components/Dialog.vue'
+import Avatar from '@/components/Avatar.vue'
 
 app.use(router)
 app.use(ElementPlus);
 app.config.globalProperties.VueCookies = VueCookies;
 app.config.globalProperties.globalInfo = {
-  bodywidth:1100
+  bodywidth:1100,
+  avatarUrl:"/api/file/getAvatar/"
 }
 app.config.globalProperties.Verify = Verify
 app.config.globalProperties.Message = Message
 app.config.globalProperties.request = request
 app.component("Dialog",Dialog)
+app.component("Avatar",Avatar)
 app.mount('#app')
