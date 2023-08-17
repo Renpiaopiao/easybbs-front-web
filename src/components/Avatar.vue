@@ -50,4 +50,8 @@ const gotoUserCenter = () => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.avatar {
+  cursor: pointer;
+}
+</style>

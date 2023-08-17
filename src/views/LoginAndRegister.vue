@@ -155,7 +155,6 @@
             <el-input
               v-model="formData.checkCode"
               size="large"
-              clearable
               placeholder="请输入验证码"
             >
               <template #prefix>
@@ -247,7 +246,9 @@
 <script setup>
 import { ref, reactive, getCurrentInstance, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import md5 from "js-md5"
+const store = useStore()
 const { proxy } = getCurrentInstance()
 const api = {
   checkCode: '/api/checkCode',
@@ -400,7 +401,6 @@ const resetForm = () => {
     // 登录，判断有误cookie信息
     if(opType.value === 1){
       const cookieLoginInfo = proxy.VueCookies.get("loginInfo");
-      console.log('cookieLoginInfo:',cookieLoginInfo);
       if(cookieLoginInfo){
         formData.value = cookieLoginInfo
       }
@@ -468,6 +468,8 @@ const doSumit = () => {
       }
       dialogConfig.show = false;
       proxy.Message.success("登录成功");
+      //登录成功，修改用户信息
+      store.commit("updateLoginUserInfo",result.data);
     }else if(opType.value === 2){
       proxy.Message.success("重置密码成功，请登录")
       showPanel(1);

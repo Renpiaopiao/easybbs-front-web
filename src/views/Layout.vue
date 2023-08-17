@@ -1,12 +1,9 @@
 <template>
   <div>
     <div class="header" v-if="showHeader">
-      <div
-        class="header-content"
-        :style="{ width: proxy.globalInfo.bodywidth + 'px' }"
-      >
+      <div class="header-content" :style="{ width: proxy.globalInfo.bodywidth + 'px' }">
         <router-link to="/" class="logo">
-          <span v-for="item in logoInfo" :style="{color:item.color}">{{ item.letter }}</span>
+          <span v-for="item in logoInfo" :style="{ color: item.color }">{{ item.letter }}</span>
         </router-link>
         <div class="menu-panel"></div>
         <div class="user-info-panel">
@@ -16,17 +13,14 @@
           <el-button type="primary" size="default" class="opt-btn" @click="">
             搜索<span class="iconfont icon-search"></span>
           </el-button>
-          <!-- <el-button-group :style="{'margin-left':'10px'}">
-          <el-button type="primary" size="default" plain @click="LoginAndRegistered(1)">登录</el-button>
-          <el-button type="primary" size="default" plain @click="LoginAndRegistered(0)">注册</el-button>
-          </el-button-group> -->
-          <div class="message-info">
-            <el-dropdown>
-              <span class="el-dropdown-link">
-                <el-badge :value="12">
-                <div class="iconfont icon-message"></div>
-                </el-badge>
-              </span>
+          <template v-if="userInfo.userId">
+            <div class="message-info">
+              <el-dropdown>
+                <span class="el-dropdown-link">
+                  <el-badge :value="12">
+                    <div class="iconfont icon-message"></div>
+                  </el-badge>
+                </span>
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item>回复我的</el-dropdown-item>
@@ -36,21 +30,28 @@
                     <el-dropdown-item>系统消息</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
-            </el-dropdown>
-          </div>
-          <div class="user-info">
-            <el-dropdown>
-              <span class="el-dropdown-link">
-                <avatar :userId="7693441284" :width="50"></avatar>
-              </span>
+              </el-dropdown>
+            </div>
+            <div class="user-info">
+              <el-dropdown>
+                <span class="el-dropdown-link">
+                  <avatar :userId="7693441284" :width="40"></avatar>
+                </span>
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item>我的主页</el-dropdown-item>
                     <el-dropdown-item>退出</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
-            </el-dropdown>
-          </div>
+              </el-dropdown>
+            </div>
+          </template> 
+          <template v-else>
+            <el-button-group :style="{ 'margin-left': '10px' }">
+            <el-button type="primary" size="default" plain @click="LoginAndRegistered(1)">登录</el-button>
+            <el-button type="primary" size="default" plain @click="LoginAndRegistered(0)">注册</el-button>
+            </el-button-group>
+          </template>
         </div>
       </div>
     </div>
@@ -64,48 +65,51 @@
 <script setup>
 import LoginAndRegister from './LoginAndRegister.vue'
 import { ref, reactive, getCurrentInstance } from 'vue'
-import { onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router'
+import { onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex'
 const { proxy } = getCurrentInstance()
-const router = useRouter()
-const route = useRoute()
+const store = useStore()
+const api = {
+  getUserInfo: "/getUserInfo"
+}
 //标题字母数组
 const logoInfo = ref([
   {
-    letter:'L',
-    color:"#3285FF"
+    letter: 'L',
+    color: "#3285FF"
   },
   {
-    letter:'e',
-    color:"#FB3624"
+    letter: 'e',
+    color: "#FB3624"
   },
   {
-    letter:'m',
-    color:"#FFBA02"
+    letter: 'm',
+    color: "#FFBA02"
   },
   {
-    letter:'o',
-    color:"#3285FF"
+    letter: 'o',
+    color: "#3285FF"
   },
   {
-    letter:'n',
-    color:"#25B24E"
+    letter: 'n',
+    color: "#25B24E"
   },
   {
-    letter:'T',
-    color:"#FD3224"
+    letter: 'T',
+    color: "#FD3224"
   },
   {
-    letter:'r',
-    color:"#FFBA02"
+    letter: 'r',
+    color: "#FFBA02"
   },
   {
-    letter:'e',
-    color:"#3285FF"
+    letter: 'e',
+    color: "#3285FF"
   },
   {
-    letter:'e',
-    color:"#FB3624"
+    letter: 'e',
+    color: "#FB3624"
   }
 ])
 //登录注册
@@ -121,41 +125,67 @@ const getScrollTop = () => {
 }
 const initScroll = () => {
   let initScrollTop = getScrollTop()
-  //1表上往下滚动，0表示往上滚动
-  window.addEventListener('scroll',()=>{
+  //1表上往下滚动，0表示往上滚动, 滑动100px后，header消失
+  window.addEventListener('scroll', () => {
     let currentScollTop = getScrollTop()
     let scrollType = 0
-    if(currentScollTop > initScrollTop){
+    if (currentScollTop > initScrollTop) {
       scrollType = 1
-    }else {
+    } else {
       scrollType = 0
     }
     initScrollTop = currentScollTop
-    if(scrollType===1 && currentScollTop > 100){
+    if (scrollType === 1 && currentScollTop > 100) {
       showHeader.value = false
-    }else {
+    } else {
       showHeader.value = true
     }
   })
-} 
-onMounted(()=>{
-  initScroll()
+}
+onMounted(() => {
+  initScroll();
+  getUserInfo()
 })
+
+// 获取用户信息
+const getUserInfo = async () => {
+  let result = await proxy.request({
+     url:api.getUserInfo
+  })
+  if(!result){
+    return;
+  }
+  store.commit("updateLoginUserInfo",result.data);
+}
+
+// 监听用户的信息变化
+const userInfo = ref({})
+watch(() => store.state.loginUserInfo, 
+(newVal, oldVal) => { 
+  if(newVal !== undefined && newVal !== null){
+    userInfo.value = newVal;
+  }else {
+    userInfo.value = {};
+  }
+}, { immediate: true, deep: true });
 
 </script>
 
 <style lang="scss" scoped>
 .header {
   box-shadow: 0 2px 6px 0 #ddd;
+
   .header-content {
     margin: 0 auto;
     height: 60px;
     display: flex;
     align-items: center;
+
     .logo {
       text-decoration: none;
       display: block;
       margin: 5px;
+
       span {
         font-size: 35px;
       }
@@ -169,25 +199,28 @@ onMounted(()=>{
       width: 300px;
       display: flex;
       align-items: center;
+
       .opt-btn {
         margin-left: 5px;
+
         .iconfont {
           margin-left: 5px;
         }
       }
+
       .message-info {
         .icon-message {
           font-size: 25px;
           color: #878585;
         }
+
         margin-left: 5px;
         margin-right: 25px;
+        cursor: pointer;
       }
-      .user-info {
- 
-      }
+
+      .user-info {}
     }
 
   }
-}
-</style>
+}</style>
