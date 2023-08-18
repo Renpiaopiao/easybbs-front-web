@@ -75,7 +75,7 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="body-content">
       <router-view></router-view>
     </div>
     <LoginAndRegister ref="loginRegisterRef"></LoginAndRegister>
@@ -215,7 +215,11 @@ watch(() =>store.state.showLogin, (newVal, oldVal) => {
 <style lang="scss" scoped>
 .header {
   box-shadow: 0 2px 6px 0 #ddd;
-
+  width: 100%;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  background: #fff;
   .header-content {
     margin: 0 auto;
     height: 60px;
@@ -285,5 +289,10 @@ watch(() =>store.state.showLogin, (newVal, oldVal) => {
   .sub-board:hover {
     color: var(--link);
   }
+}
+
+.body-content {
+  margin-top: 60px;
+  position: relative;
 }
 </style>

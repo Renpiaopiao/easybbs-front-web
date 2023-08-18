@@ -6,7 +6,14 @@ const router = createRouter({
     {
       path:'/',
       name:'layout',
-      component:()=>import('@/views/Layout.vue')
+      component:()=>import('@/views/Layout.vue'),
+      children:[
+        {
+          path:'/',
+          name:'ArticleList',
+          component:()=>import('@/views/forum/ArticleList.vue'),
+        }
+      ]
     }
   ]
 })
