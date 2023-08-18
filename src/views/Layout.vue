@@ -2,10 +2,30 @@
   <div>
     <div class="header" v-if="showHeader">
       <div class="header-content" :style="{ width: proxy.globalInfo.bodywidth + 'px' }">
+        <!-- logo -->
         <router-link to="/" class="logo">
           <span v-for="item in logoInfo" :style="{ color: item.color }">{{ item.letter }}</span>
         </router-link>
-        <div class="menu-panel"></div>
+        <!-- 板块信息 -->
+        <div class="menu-panel">
+          <template v-for="board in boardList">
+            <el-popover
+            placement="bottom-start"
+            :width="200"
+            trigger="hover"
+            v-if="board.children.length > 0"
+          >
+            <template #reference>
+              <span class="menu-item">{{ board.boardName }}</span>
+            </template>
+            <div class="sub-board-list">
+              <span class="sub-board" v-for="subBoard in board.children">{{ subBoard.boardName }}</span>
+            </div>
+          </el-popover>
+          <span class="menu-item" v-else>{{ board.boardName }}</span>
+        </template>
+        </div>
+        <!-- 右侧按钮模块：登录、注册、搜索 -->
         <div class="user-info-panel">
           <el-button type="primary" size="default" class="opt-btn" @click="">
             发帖<span class="iconfont icon-add"></span>
@@ -71,7 +91,8 @@ import { useStore } from 'vuex'
 const { proxy } = getCurrentInstance()
 const store = useStore()
 const api = {
-  getUserInfo: "/getUserInfo"
+  getUserInfo: "/getUserInfo",
+  loadBoard: "/board/loadBoard"
 }
 //标题字母数组
 const logoInfo = ref([
@@ -169,6 +190,26 @@ watch(() => store.state.loginUserInfo,
   }
 }, { immediate: true, deep: true });
 
+// 获取板块信息
+const boardList = ref([]);
+const loadBoard = async () => {
+  let result = await proxy.request({
+     url:api.loadBoard
+  })
+  if(!result){
+    return;
+  }
+  boardList.value = result.data
+}
+loadBoard()
+
+// 监听登录框
+watch(() =>store.state.showLogin, (newVal, oldVal) => {
+  if(newVal){
+    LoginAndRegistered(1)
+  }
+}, { immediate: true, deep: true });
+
 </script>
 
 <style lang="scss" scoped>
@@ -193,6 +234,10 @@ watch(() => store.state.loginUserInfo,
 
     .menu-panel {
       flex: 1;
+      .menu-item {
+        margin-left: 20px;
+        cursor: pointer;
+      }
     }
 
     .user-info-panel {
@@ -223,4 +268,22 @@ watch(() => store.state.loginUserInfo,
     }
 
   }
-}</style>
+}
+
+.sub-board-list {
+  display: flex;
+  flex-wrap: wrap;
+  .sub-board {
+    padding: 0px 10px;
+    border-radius: 20px;
+    margin-right: 10px;
+    background: #ddd;
+    border: 1px solid #ddd;
+    color: rgb(135, 134, 134);
+    margin-top: 10px;
+  }
+  .sub-board:hover {
+    color: var(--link);
+  }
+}
+</style>

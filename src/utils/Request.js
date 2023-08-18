@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ElLoading } from 'element-plus'
 import Message from '@/utils/Message'
+import store from '@/store'
 
 const contentTypeForm = 'application/x-www-form-urlencoded;charset=UTF-8'
 const contentTypeJson = 'application/json'
@@ -43,6 +44,9 @@ instance.interceptors.response.use(
     if(responseData.code === 200){
       return responseData;
     }else if(responseData.code === 901){
+      store.commit("showLogin",true)
+      //超时后更新用户信息（比如：用户停留时间过久）
+      store.commit("updateLoginUserInfo",null);
       return Promise.reject({ showError : false, msg: "登录超时"})
     }else{
       if(errorCallback){
