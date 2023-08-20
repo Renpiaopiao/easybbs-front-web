@@ -10,7 +10,17 @@ const router = createRouter({
       children:[
         {
           path:'/',
-          name:'ArticleList',
+          name:'所有文章',
+          component:()=>import('@/views/forum/ArticleList.vue'),
+        },
+        {
+          path:'/forum/:pBoardId',
+          name:'一级模块',
+          component:()=>import('@/views/forum/ArticleList.vue'),
+        },
+        {
+          path:'/forum/:pBoardId/:boardId',
+          name:'二级模块',
           component:()=>import('@/views/forum/ArticleList.vue'),
         }
       ]

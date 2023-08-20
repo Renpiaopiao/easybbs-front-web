@@ -8,6 +8,7 @@
         </router-link>
         <!-- 板块信息 -->
         <div class="menu-panel">
+          <span class="menu-item" to="/">首页</span>
           <template v-for="board in boardList">
             <el-popover
             placement="bottom-start"
@@ -16,13 +17,13 @@
             v-if="board.children.length > 0"
           >
             <template #reference>
-              <span class="menu-item">{{ board.boardName }}</span>
+              <span class="menu-item" @click="boardClickHandler(board)">{{ board.boardName }}</span>
             </template>
             <div class="sub-board-list">
-              <span class="sub-board" v-for="subBoard in board.children">{{ subBoard.boardName }}</span>
+              <span class="sub-board" v-for="subBoard in board.children" @click="subBoardClickHandler(subBoard)">{{ subBoard.boardName }}</span>
             </div>
           </el-popover>
-          <span class="menu-item" v-else>{{ board.boardName }}</span>
+          <span class="menu-item" v-else  @click="boardClickHandler(board)">{{ board.boardName }}</span>
         </template>
         </div>
         <!-- 右侧按钮模块：登录、注册、搜索 -->
@@ -86,10 +87,11 @@
 import LoginAndRegister from './LoginAndRegister.vue'
 import { ref, reactive, getCurrentInstance } from 'vue'
 import { onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { useStore } from 'vuex'
 const { proxy } = getCurrentInstance()
 const store = useStore()
+const router = useRouter()
 const api = {
   getUserInfo: "/getUserInfo",
   loadBoard: "/board/loadBoard"
@@ -210,6 +212,16 @@ watch(() =>store.state.showLogin, (newVal, oldVal) => {
   }
 }, { immediate: true, deep: true });
 
+//一级板块点击
+const boardClickHandler = (board) => {
+  router.push(`/forum/${board.boardId}`)
+}
+
+//二级板块点击
+const subBoardClickHandler =  (subBoard) => {
+  router.push(`/forum/${subBoard.pBoardId}/${subBoard.boardId}`)
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -285,6 +297,7 @@ watch(() =>store.state.showLogin, (newVal, oldVal) => {
     border: 1px solid #ddd;
     color: rgb(135, 134, 134);
     margin-top: 10px;
+    cursor: pointer;
   }
   .sub-board:hover {
     color: var(--link);

@@ -29,9 +29,7 @@
           </span>
         </div>
       </div>
-      <div class="cover">
-        <img :src="'/api/file/getImage/' + data.cover" alt="">
-      </div>
+        <Cover :cover="data.cover" :width="120" v-if="data.cover"></Cover>
     </div>
   </div>
 </template> 
@@ -59,6 +57,7 @@ const props = defineProps({
     padding: 10px;
     display: flex;
     .article-body {
+      flex: 1;
       .user-info {
         display: flex;
         align-items: center;
@@ -120,4 +119,6 @@ const props = defineProps({
 
 .article-item:hover {
   background: #f6f6f689;
-}</style>
+}
+
+</style>
