@@ -398,7 +398,7 @@ const resetForm = () => {
     changeCheckCode(0);
     formDataRef.value.resetFields();
 
-    // 登录，判断有误cookie信息
+    // 登录，判断有无cookie信息
     if(opType.value === 1){
       const cookieLoginInfo = proxy.VueCookies.get("loginInfo");
       if(cookieLoginInfo){

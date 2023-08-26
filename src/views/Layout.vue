@@ -202,6 +202,8 @@ const loadBoard = async () => {
     return;
   }
   boardList.value = result.data
+  //板块信息存入
+  store.commit('saveBoardList',result.data)
 }
 loadBoard()
 

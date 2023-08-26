@@ -3,6 +3,15 @@
   :style="{ width: proxy.globalInfo.bodywidth + 'px' }"
   class="content-body article-list-body"
   > 
+    <!-- 二级板块信息 -->
+    <div class="sub-board" v-if="pBoardId">
+      <span class="board-item" :class="boardId==0?'active':''">
+        <router-link :to="`/forum/${pBoardId}`">全部</router-link>
+      </span>
+      <span  class="board-item" v-for="item in subBoardList" :class="item.boardId == boardId?'active':''">
+        <router-link :to="`/forum/${item.pBoardId}/${item.boardId}`">{{ item.boardName }}</router-link>
+      </span>
+    </div>
      <div class="article-panel">
         <div class="top-tab">
           <div :class="['tab', orderType === 0?'active':'']" @click=changeOrderType(0)>热榜</div>
@@ -27,8 +36,10 @@ import ArticleListItem from "./ArticleListItem.vue"
 import { ref, getCurrentInstance } from "vue"
 import { useRoute } from 'vue-router';
 import { onMounted,watch } from 'vue'
+import { useStore } from 'vuex'
 const { proxy } = getCurrentInstance();
 const route = useRoute()
+const store = useStore()
 
 const api =  {
   loadArticle:'/forum/loadArticle'
@@ -73,17 +84,52 @@ const loadArticle =  async () => {
   articleInfo.value = result.data
 }
 
+//二级板块展示
+const subBoardList = ref([])
+const setSubBoard = () => {
+  subBoardList.value = store.getters.getSubBoardList(pBoardId.value)
+}
+
 //监听路由变化
 watch(() =>route.params, (newVal, oldVal) => {
   pBoardId.value = newVal.pBoardId;
-  boardId.value = newVal.boardId;
+  boardId.value = newVal.boardId || 0;
   loadArticle();
+  setSubBoard();
+}, { immediate: true, deep: true });
+
+// 监听板块变化
+watch(() =>store.state.boardList, (newVal, oldVal) => {
+  setSubBoard();
 }, { immediate: true, deep: true });
 
 </script>
 
 <style lang="scss" scoped>
 .article-list-body {
+  .sub-board {
+    padding: 10px 0px 10px 0px;
+    .board-item {
+      background: #fff;
+      border-radius: 15px;
+      padding: 2px 10px;
+      margin-right: 10px;
+      color: #909090;
+      cursor: pointer;
+      font-size: 14px;
+      a {
+        text-decoration: none;
+        color: #909090;
+      }
+    }
+    .active {
+        background: var(--link);
+
+        a {
+          color: #fff;
+        }
+      }
+  }
   .article-panel {
     background: #fff;
     .top-tab {
